@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penbrothers QuickQuote Calculator</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for professional look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb; /* Light background */
+        }
+        .card {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e0e0e0;
+        }
+        .result-box {
+            background-color: #e6f7ff; /* Light blue background for results */
+            border-left: 5px solid #007acc; /* Penbrothers primary color (mock) */
+        }
+        input[type="radio"]:checked + label {
+            border-color: #007acc;
+            background-color: #e6f7ff;
+            color: #007acc;
+            font-weight: 600;
+        }
+        .label-radio {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .label-radio:hover {
+            border-color: #007acc;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8 min-h-screen">
+
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-gray-900 mb-2">Penbrothers QuickQuote</h1>
+            <p class="text-lg text-gray-500">Your 24/7 Costing Partner for Immediate Transparency</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Input Card -->
+            <div id="input-card" class="lg:col-span-2 p-6 bg-white rounded-xl card space-y-6">
+                <h2 class="text-2xl font-bold text-gray-800 border-b pb-3 mb-4">Employee Details & Requirements</h2>
+
+                <!-- 1. Monthly Salary -->
+                <div>
+                    <label for="monthlySalary" class="block text-sm font-medium text-gray-700 mb-1">Monthly Salary (in Philippine Pesos - PHP)</label>
+                    <input type="number" id="monthlySalary" oninput="calculateInvoice()" min="0" value="50000"
+                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 text-lg border-2">
+                </div>
+
+                <!-- 2. Shift Differential -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">What Philippine Shift will this employee work?</label>
+                    <div class="flex flex-wrap gap-4" id="shiftRadios">
+                        <input type="radio" id="dayShift" name="shift" value="0" class="hidden" checked onchange="calculateInvoice()">
+                        <label for="dayShift" class="label-radio p-3 border-2 border-gray-300 rounded-lg flex-1 text-center">Day Shift (0%)</label>
+
+                        <input type="radio" id="midShift" name="shift" value="0.05" class="hidden" onchange="calculateInvoice()">
+                        <label for="midShift" class="label-radio p-3 border-2 border-gray-300 rounded-lg flex-1 text-center">Midshift (+5%)</label>
+
+                        <input type="radio" id="nightShift" name="shift" value="0.10" class="hidden" onchange="calculateInvoice()">
+                        <label for="nightShift" class="label-radio p-3 border-2 border-gray-300 rounded-lg flex-1 text-center">Night Shift (+10%)</label>
+                    </div>
+                </div>
+
+                <!-- 3. Invoice Currency -->
+                <div>
+                    <label for="invoiceCurrency" class="block text-sm font-medium text-gray-700 mb-1">Invoice Currency</label>
+                    <select id="invoiceCurrency" onchange="calculateInvoice()"
+                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 text-lg border-2">
+                        <option value="PHP">PHP (Philippine Peso)</option>
+                        <option value="USD">USD (US Dollar)</option>
+                        <option value="EUR">EUR (Euro)</option>
+                        <option value="AUD">AUD (Australian Dollar)</option>
+                        <option value="SGD">SGD (Singapore Dollar)</option>
+                        <option value="GBP">GBP (British Pound)</option>
+                        <option value="HKD">HKD (Hong Kong Dollar)</option>
+                        <option value="NZD">NZD (New Zealand Dollar)</option>
+                    </select>
+                </div>
+
+                <!-- 4. Office Space -->
+                <div>
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="officeSpace" onchange="calculateInvoice()" class="form-checkbox h-5 w-5 text-blue-600 rounded">
+                        <span class="ml-3 text-sm font-medium text-gray-700">Need Office Space? (PHP 13,000/month)</span>
+                    </label>
+                </div>
+
+                <!-- 5. Laptop Requirement -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Need a Laptop? (Base Cost: PHP 45,000)</label>
+                    <div class="flex flex-wrap gap-4" id="laptopRadios">
+                        <input type="radio" id="laptopNo" name="laptopOption" value="none" class="hidden" checked onchange="calculateInvoice()">
+                        <label for="laptopNo" class="label-radio p-3 border-2 border-gray-300 rounded-lg flex-1 text-center">No Laptop Needed</label>
+
+                        <input type="radio" id="laptopUpfront" name="laptopOption" value="upfront" class="hidden" onchange="calculateInvoice()">
+                        <label for="laptopUpfront" class="label-radio p-3 border-2 border-gray-300 rounded-lg flex-1 text-center">Upfront Purchase (+15% markup)</label>
+
+                        <input type="radio" id="laptopLease" name="laptopOption" value="lease" class="hidden" onchange="calculateInvoice()">
+                        <label for="laptopLease" class="label-radio p-3 border-2 border-gray-300 rounded-lg flex-1 text-center">Lease to Own (2 Yrs, +5.5% Fee)</label>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Results Card -->
+            <div class="lg:col-span-1 p-6 bg-white rounded-xl card space-y-6">
+                <h2 class="text-2xl font-bold text-gray-800 border-b pb-3 mb-4">Estimated Invoice Amount</h2>
+                
+                <div id="results" class="space-y-4">
+                    <!-- Recurring Monthly Invoice -->
+                    <div class="result-box p-4 rounded-lg">
+                        <p class="text-sm font-medium text-gray-700">Recurring Monthly Invoice (Estimated)</p>
+                        <p class="text-3xl font-extrabold text-blue-800" id="monthlyTotalResult">--</p>
+                        <p class="text-xs text-gray-500">(Includes salary, shift, office, monthly LTO, and 30% Service Fee)</p>
+                    </div>
+
+                    <!-- One-Time Upfront Invoice -->
+                    <div class="result-box p-4 rounded-lg bg-yellow-50 border-yellow-300 border-l-4" id="upfrontResultContainer">
+                        <p class="text-sm font-medium text-gray-700">One-Time Upfront Invoice (if applicable)</p>
+                        <p class="text-3xl font-extrabold text-yellow-800" id="upfrontTotalResult">--</p>
+                        <p class="text-xs text-gray-500" id="upfrontMessage">(Applies only if Upfront Laptop Purchase is selected)</p>
+                    </div>
+
+                    <!-- Breakdown (PHP) -->
+                    <div class="pt-4 border-t">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">Internal Breakdown (PHP)</h3>
+                        <ul class="text-sm text-gray-600 space-y-1" id="breakdownList">
+                            <li>Base Salary + Shift: <span class="font-mono float-right" id="breakdownBaseComp">0.00</span></li>
+                            <li>Office Space Monthly Fee: <span class="font-mono float-right" id="breakdownOffice">0.00</span></li>
+                            <li>Laptop Lease to Own (Monthly): <span class="font-mono float-right" id="breakdownLaptopLTO">0.00</span></li>
+                            <li>Total Direct Cost (Subtotal): <span class="font-mono float-right font-semibold" id="breakdownSubtotal">0.00</span></li>
+                            <li><span class="font-semibold text-green-700">Service Fee (30% on Subtotal)</span>: <span class="font-mono float-right text-green-700 font-semibold" id="breakdownServiceFee">0.00</span></li>
+                            <li class="pt-2 border-t font-bold text-base">TOTAL RECURRING MONTHLY: <span class="font-mono float-right" id="breakdownTotalPHP">0.00</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="mt-8 pt-4 border-t text-center text-sm text-gray-500">
+            <p>*Disclaimer: Costs are estimates and based on mock rates/fees for demonstration purposes. Actual invoice amounts may vary.</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- Configuration Constants (MOCK DATA) ---
+
+        // Mock Laptop Costs (PHP)
+        const LAPTOP_BASE_COST = 45000;
+        const LAPTOP_UPFRONT_MARKUP = 0.15; // 15%
+        const LAPTOP_LEASE_FEE_RATE = 0.055; // 5.5% fixed fee
+        const LAPTOP_LEASE_MONTHS = 24; // 2 years
+
+        // Mock Office Space Cost (PHP/month)
+        const OFFICE_SPACE_COST = 13000; // Updated from 8000 to 13000
+
+        // Mock Service Fee Percentage
+        const SERVICE_FEE_RATE = 0.30; // 30%
+
+        // Mock Exchange Rates (PHP base)
+        const EXCHANGE_RATES = {
+            'PHP': 1.0,
+            'USD': 55.00, // 1 USD = 55.00 PHP
+            'EUR': 60.00,
+            'AUD': 35.00,
+            'SGD': 40.00,
+            'GBP': 65.00,
+            'HKD': 7.00,
+            'NZD': 32.00,
+        };
+
+        // --- Utility Functions ---
+
+        /**
+         * Formats a number as a currency string.
+         * @param {number} amount - The numeric value to format.
+         * @param {string} currencyCode - The 3-letter currency code (e.g., 'PHP').
+         * @returns {string} The formatted currency string.
+         */
+        function formatCurrency(amount, currencyCode) {
+            const formatter = new Intl.NumberFormat('en-PH', {
+                style: 'currency',
+                currency: currencyCode,
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            return formatter.format(amount);
+        }
+
+        // --- Core Calculation Logic ---
+
+        function calculateInvoice() {
+            // 1. Get Input Values
+            const salary = parseFloat(document.getElementById('monthlySalary').value) || 0;
+            const shiftRate = parseFloat(document.querySelector('input[name="shift"]:checked').value);
+            const currencyCode = document.getElementById('invoiceCurrency').value;
+            const needsOffice = document.getElementById('officeSpace').checked;
+            const laptopOption = document.querySelector('input[name="laptopOption"]:checked').value;
+            
+            // Ensure salary is a non-negative number
+            if (salary < 0) {
+                document.getElementById('monthlySalary').value = 0;
+                return;
+            }
+
+            // --- Calculation Variables (All in PHP) ---
+            let monthlyRecurringPHP = 0;
+            let oneTimeUpfrontPHP = 0;
+
+            // --- 2. Calculate Base Compensation (Salary + Shift) ---
+            const shiftDifferential = salary * shiftRate;
+            const baseCompensation = salary + shiftDifferential; // Salary + 0% / 5% / 10%
+
+            // --- 3. Calculate Office Cost ---
+            const officeMonthlyCost = needsOffice ? OFFICE_SPACE_COST : 0;
+
+            // --- 4. Calculate Laptop Costs ---
+            let laptopMonthlyFee = 0;
+            let upfrontMessage = "(Applies only if Upfront Laptop Purchase is selected)";
+
+            if (laptopOption === 'upfront') {
+                // Upfront Purchase: One-time cost (Base + 15% Markup)
+                oneTimeUpfrontPHP = LAPTOP_BASE_COST * (1 + LAPTOP_UPFRONT_MARKUP);
+                upfrontMessage = `One-time upfront cost of ${formatCurrency(oneTimeUpfrontPHP, 'PHP')}. No recurring fee.`;
+            } else if (laptopOption === 'lease') {
+                // Lease to Own: Monthly cost over 24 months (Base + 5.5% Fee)
+                const totalLeaseAmount = LAPTOP_BASE_COST * (1 + LAPTOP_LEASE_FEE_RATE);
+                laptopMonthlyFee = totalLeaseAmount / LAPTOP_LEASE_MONTHS;
+                upfrontMessage = `Lease is included in the monthly invoice for 24 months. Total fee included is ${formatCurrency(LAPTOP_BASE_COST * LAPTOP_LEASE_FEE_RATE, 'PHP')}.`;
+            }
+
+            // --- 5. Calculate Total Direct Cost (Subtotal for Service Fee) ---
+            const subtotalDirectCost = baseCompensation + officeMonthlyCost + laptopMonthlyFee;
+            
+            // --- 6. Calculate Service Fee (30% on Subtotal) ---
+            const serviceFee = subtotalDirectCost * SERVICE_FEE_RATE;
+
+            // --- 7. Calculate Total Recurring Monthly Invoice (PHP) ---
+            monthlyRecurringPHP = subtotalDirectCost + serviceFee;
+            
+            // --- 8. Currency Conversion ---
+            const exchangeRate = EXCHANGE_RATES[currencyCode] || 1; // Default to 1 if not found
+            const monthlyRecurringConverted = monthlyRecurringPHP / exchangeRate;
+            const oneTimeUpfrontConverted = oneTimeUpfrontPHP / exchangeRate;
+
+            // --- 9. Update UI Results ---
+
+            // Recurring Monthly Invoice
+            document.getElementById('monthlyTotalResult').textContent = formatCurrency(monthlyRecurringConverted, currencyCode);
+
+            // One-Time Upfront Invoice
+            document.getElementById('upfrontTotalResult').textContent = formatCurrency(oneTimeUpfrontConverted, currencyCode);
+            document.getElementById('upfrontMessage').textContent = upfrontMessage;
+            
+            // Conditional Styling for Upfront Box
+            const upfrontContainer = document.getElementById('upfrontResultContainer');
+            if (oneTimeUpfrontPHP > 0) {
+                upfrontContainer.classList.remove('bg-yellow-50', 'border-yellow-300', 'border-l-4');
+                upfrontContainer.classList.add('bg-red-50', 'border-red-500', 'border-l-4');
+            } else {
+                upfrontContainer.classList.remove('bg-red-50', 'border-red-500', 'border-l-4');
+                upfrontContainer.classList.add('bg-yellow-50', 'border-yellow-300', 'border-l-4');
+            }
+
+
+            // Breakdown List (always in PHP)
+            document.getElementById('breakdownBaseComp').textContent = formatCurrency(baseCompensation, 'PHP');
+            document.getElementById('breakdownOffice').textContent = formatCurrency(officeMonthlyCost, 'PHP');
+            document.getElementById('breakdownLaptopLTO').textContent = formatCurrency(laptopMonthlyFee, 'PHP');
+            document.getElementById('breakdownSubtotal').textContent = formatCurrency(subtotalDirectCost, 'PHP');
+            document.getElementById('breakdownServiceFee').textContent = formatCurrency(serviceFee, 'PHP');
+            document.getElementById('breakdownTotalPHP').textContent = formatCurrency(monthlyRecurringPHP, 'PHP');
+        }
+
+        // Initialize calculation on load
+        window.onload = calculateInvoice;
+
+    </script>
+</body>
+</html>
