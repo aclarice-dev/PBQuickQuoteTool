@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penbrothers QuickQuote Calculator</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for professional look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb; /* Light background */
+        }
+        .card {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e0e0e0;
+        }
+        .result-box {
+            background-color: #e6f7ff; /* Light blue background for results */
+            border-left: 5px solid #007acc; /* Penbrothers primary color (mock) */
+        }
+        input[type="radio"]:checked + label {
+            border-color: #007acc;
+            background-color: #e6f7ff;
+            color: #007acc;
+            font-weight: 600;
+        }
+        .label-radio {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .label-radio:hover {
+            border-color: #007acc;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8 min-h-screen">
+
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-gray-900 mb-2">Penbrothers QuickQuote</h1>
+            <p class="text-lg text-gray-500">Your 24/7 Costing Partner for Immediate Transparency</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:col-span-3 gap-8 lg:grid-cols-3">
+            <!-- Input Card -->
+            <div id="input-card" class="lg:col-span-2 p-6 bg-white rounded-xl card space-y-6">
+                <h2 class="text-2xl font-bold text-gray-800 border-b pb-3 mb-4">Employee Details & Requirements</h2>
+
+                <!-- 1. Monthly Salary -->
+                <div>
+                    <label for="monthlySalary" class="block text-sm font-medium text-gray-700 mb-1">Monthly Salary (in Philippine Pesos - PHP)</label>
+                    <input type="number" id="monthlySalary" oninput="calculateInvoice()" min="0" value="50000"
+                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 text-lg border-2">
+                </div>
+
+                <!-- 2. Shift Differential -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">What Philippine Shift will this employee work?</label>
+                    <div class="flex flex-wrap gap-4" id="shiftRadios">
+                        <input type="radio" id="dayShift" name="shift" value="0" class="hidden" checked onchange="calculateInvoice()">
+                        <label for="dayShift" class="label-radio p-3 border-2 border-gray-300 rounded-lg flex-1 text-center">Day Shift (0%)</label>
+
+                        <input type="radio" id="midShift" name="shift" value="0.05" class="hidden" onchange="calculateInvoice()">
+                        <label for="midShift" class="label-radio p-3 border-2 border-gray-300 rounded-lg flex-1 text-center">Midshift (+5%)</label>
+
+                        <input type="radio" id="nightShift" name="shift" value="0.10" class="hidden" onchange="calculateInvoice()">
+                        <label for="nightShift" class="label-radio p-3 border-2 border-gray-300 rounded-lg flex-1 text-center">Night Shift (+10%)</label>
+                    </div>
+                </div>
+
+                <!-- 3. Invoice Currency -->
+                <div>
+                    <label for="invoiceCurrency" class="block text-sm font-medium text-gray-700 mb-1">Invoice Currency</label>
+                    <select id="invoiceCurrency" onchange="calculateInvoice()"
+                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 text-lg border-2">
+                        <option value="PHP">PHP (Philippine Peso)</option>
+                        <option value="USD">USD (US Dollar)</option>
+                        <option value="EUR">EUR (Euro)</option>
+                        <option value="AUD">AUD (Australian Dollar)</option>
+                        <option value="SGD">SGD (Singapore Dollar)</option>
+                        <option value="GBP">GBP (British Pound)</option>
+                        <option value="HKD">HKD (Hong Kong Dollar)</option>
+                        <option value="NZD">NZD (New Zealand Dollar)</option>
+                    </select>
+                </div>
+
+                <!-- 4. Office Space -->
+                <div>
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="officeSpace" onchange="calculateInvoice()" class="form-checkbox h-5 w-5 text-blue-600 rounded">
+                        <span class="ml-3 text-sm font-medium text-gray-700">Need Office Space? (PHP 13,000/month)</span>
+                    </label>
+                </div>
+
+                <!-- 5. Laptop Requirement -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Need a Laptop? (Base Cost: PHP 50,000 - Med Specs)</label>
+                    <div class="flex flex-wrap gap-4" id="laptopRadios">
+                        <input type="radio" id="laptopNo" name="laptopOption" value="none" class="hidden" checked onchange="calculateInvoice()">
+                        <label for="laptopNo" class="label-radio p-3 border-2 border-gray-300 rounded-lg flex-1 text-center">No Laptop Needed</label>
+
+                        <input type="radio" id="laptopUpfront" name="laptopOption" value="upfront" class="hidden" onchange="calculateInvoice()">
+                        <label for="laptopUpfront" class="label-radio p-3 border-2 border-gray-300 rounded-lg flex-1 text-center">Upfront Purchase</label>
+
+                        <input type="radio" id="laptopLease" name="laptopOption" value="lease" class="hidden" onchange="calculateInvoice()">
+                        <label for="laptopLease" class="label-radio p-3 border-2 border-gray-300 rounded-lg flex-1 text-center">Lease to Own</label>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Results Card -->
+            <div class="lg:col-span-1 p-6 bg-white rounded-xl card space-y-6">
+                <h2 class="text-2xl font-bold text-gray-800 border-b pb-3 mb-4">Estimated Invoice Amount</h2>
+                
+                <div id="results" class="space-y-4">
+                    <!-- Recurring Monthly Invoice -->
+                    <div class="result-box p-4 rounded-lg">
+                        <p class="text-sm font-medium text-gray-700">Total Recurring Monthly Invoice (Estimated)</p>
+                        <p class="text-3xl font-extrabold text-blue-800" id="monthlyTotalResult">--</p>
+                    </div>
+
+                    <!-- One-Time Upfront Invoice -->
+                    <div class="result-box p-4 rounded-lg bg-yellow-50 border-yellow-300 border-l-4" id="upfrontResultContainer">
+                        <p class="text-sm font-medium text-gray-700">One-Time Upfront Invoice (Estimated)</p>
+                        <p class="text-3xl font-extrabold text-yellow-800" id="upfrontTotalResult">--</p>
+                        <!-- Updated message placeholder -->
+                        <p class="text-xs text-gray-500" id="upfrontMessage"></p>
+                    </div>
+
+                    <!-- Breakdown (Converted Currency) -->
+                    <div class="pt-4 border-t">
+                        <!-- Monthly Breakdown -->
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2" id="breakdownTitle">Detailed Monthly Breakdown (PHP)</h3>
+                        
+                        <!-- START: Aligned Breakdown Structure (Monthly) -->
+                        <div id="breakdownDetails" class="space-y-1 text-sm text-gray-600">
+                            <h4 class="text-base font-bold text-gray-800 mt-3 border-b-2">Employee Cost Subtotal</h4>
+                            
+                            <!-- Base Compensation -->
+                            <div class="flex justify-between">
+                                <span>Base Salary and Shift:</span>
+                                <span class="font-mono" id="breakdownGrossSalary">0.00</span>
+                            </div>
+
+                            <!-- Statutory Benefits Total -->
+                            <div class="flex justify-between">
+                                <span>Statutory Benefits (Employer Share):</span>
+                                <span class="font-mono" id="breakdownStatutory">0.00</span>
+                            </div>
+                            <!-- Statutory Sub-items (Indented but right-aligned) -->
+                            <div class="flex justify-between ml-4 text-xs text-gray-500">
+                                <span>- SSS Contribution:</span>
+                                <span class="font-mono" id="breakdownSSS">0.00</span>
+                            </div>
+                            <div class="flex justify-between ml-4 text-xs text-gray-500">
+                                <span>- PHIC Contribution:</span>
+                                <span class="font-mono" id="breakdownPHIC">0.00</span>
+                            </div>
+                            <div class="flex justify-between ml-4 text-xs text-gray-500">
+                                <span>- Pag-IBIG (HDMF):</span>
+                                <span class="font-mono" id="breakdownHDMF">0.00</span>
+                            </div>
+
+                            <!-- HMO -->
+                            <div class="flex justify-between">
+                                <span>HMO Benefits (Principal + Dependent):</span>
+                                <span class="font-mono" id="breakdownHMO">0.00</span>
+                            </div>
+                            
+                            <!-- 13th Month (Annualization) -->
+                            <div class="flex justify-between">
+                                <span>13th Month Pay (1/12th):</span>
+                                <span class="font-mono" id="breakdown13thMonth">0.00</span>
+                            </div>
+                            
+                            <!-- Tenure Fund (Annualization) - NEW SEPARATE LINE -->
+                            <div class="flex justify-between">
+                                <span>Tenure Fund (1/12th):</span>
+                                <span class="font-mono" id="breakdownTenureFund">0.00</span>
+                            </div>
+
+                            <!-- Municipal Tax -->
+                            <div class="flex justify-between">
+                                <span>Municipal Tax (1% on base):</span>
+                                <span class="font-mono" id="breakdownMunicipalTax">0.00</span>
+                            </div>
+                            
+                            <!-- Subtotal -->
+                            <div class="pt-2 border-t font-bold text-base text-gray-800 flex justify-between">
+                                <span>TOTAL EMPLOYEE COST:</span>
+                                <span class="font-mono" id="breakdownSubtotal">0.00</span>
+                            </div>
+
+                            <h4 class="text-base font-bold text-gray-800 mt-3 border-b-2">Service Fee & Resources Subtotal</h4>
+                            
+                            <!-- Service Fee -->
+                            <div class="flex justify-between">
+                                <span>Fixed Monthly Service Fee:</span>
+                                <span class="font-mono" id="breakdownServiceFee">0.00</span>
+                            </div>
+
+                            <!-- Office Space Monthly Fee (Moved) -->
+                            <div class="flex justify-between">
+                                <span>Office Space Monthly Fee:</span>
+                                <span class="font-mono" id="breakdownOffice">0.00</span>
+                            </div>
+                            
+                            <!-- Laptop Lease to Own (Monthly) (Moved) -->
+                            <div class="flex justify-between">
+                                <span>Laptop Lease to Own (Monthly):</span>
+                                <span class="font-mono" id="breakdownLaptopLTO">0.00</span>
+                            </div>
+
+                            <!-- Service & Resource Total (New Subtotal) -->
+                            <div class="pt-2 border-t font-bold text-base text-gray-800 flex justify-between">
+                                <span>TOTAL SERVICE & RESOURCES:</span>
+                                <span class="font-mono text-green-700 font-semibold" id="breakdownServiceResourceTotal">0.00</span>
+                            </div>
+                        </div>
+                        <!-- END: Aligned Breakdown Structure (Monthly) -->
+
+                        <!-- Final Total -->
+                        <div class="pt-4 border-t-2 font-bold text-xl text-blue-700 flex justify-between mt-4">
+                            <span id="breakdownTotalLabel">FINAL MONTHLY INVOICE (PHP):</span>
+                            <span class="font-mono" id="breakdownTotalPHP">0.00</span>
+                        </div>
+                        
+                        <!-- One-Time Breakdown -->
+                        <h3 class="text-lg font-semibold text-gray-700 mt-8 mb-2 border-t pt-4" id="upfrontBreakdownTitle">One-Time Upfront Invoice Breakdown (PHP)</h3>
+                        
+                        <div id="upfrontBreakdownDetails" class="space-y-1 text-sm text-gray-600">
+                            
+                            <div class="flex justify-between">
+                                <span>One-Time Setup Fee:</span>
+                                <span class="font-mono" id="breakdownSetupFee">0.00</span>
+                            </div>
+
+                            <div class="flex justify-between">
+                                <span>Employee Cost Deposit:</span>
+                                <span class="font-mono" id="breakdownDeposit">0.00</span>
+                            </div>
+
+                            <div class="flex justify-between">
+                                <span>Laptop Upfront Purchase Cost:</span>
+                                <span class="font-mono" id="breakdownLaptopUpfront">0.00</span>
+                            </div>
+
+                            <div class="pt-2 border-t font-bold text-base text-gray-800 flex justify-between">
+                                <span>TOTAL ONE-TIME UPFRONT:</span>
+                                <span class="font-mono text-yellow-800 font-semibold" id="breakdownTotalUpfront">0.00</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="mt-8 pt-4 border-t text-center text-sm text-gray-500">
+            <p>*Disclaimer: Costs are estimates and based on mock rates/fees for demonstration purposes. Actual invoice amounts may vary. Statutory rates are based on the provided tables.</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- Configuration Constants (MOCK DATA) ---
+
+        // Mock Laptop Costs (PHP)
+        const LAPTOP_BASE_COST = 50000; 
+        const LAPTOP_UPFRONT_MARKUP = 0.15; // 15%
+        const LAPTOP_LEASE_FEE_RATE = 0.055; // 5.5% fixed fee
+        const LAPTOP_LEASE_MONTHS = 24; // 2 years
+
+        // Mock Office Space Cost (PHP/month)
+        const OFFICE_SPACE_COST = 13000; 
+
+        // Fixed Fees based on Invoice Currency (Local Amount)
+        const FIXED_FEES = {
+            'USD': { setup: 300, service: 450 },
+            'EUR': { setup: 300.00, service: 450.00 },
+            'AUD': { setup: 460, service: 700 },
+            'GBP': { setup: 250, service: 400 },
+            'SGD': { setup: 400, service: 600 },
+            'PHP': { setup: 15000, service: 25000 },
+            'NZD': { setup: 450, service: 750 },
+            'HKD': { setup: 2000, service: 3300 }, // NEW
+        };
+
+        // Mock Exchange Rates (PHP base)
+        const EXCHANGE_RATES = {
+            'PHP': 1.0,
+            'USD': 55.00, // 1 USD = 55.00 PHP
+            'EUR': 60.00,
+            'AUD': 35.00,
+            'SGD': 40.00,
+            'GBP': 65.00,
+            'HKD': 7.00,
+            'NZD': 32.00,
+        };
+
+        // Pag-IBIG (HDMF) Employer Share (Fixed for salary > 1,500)
+        const HDMF_EMPLOYER_SHARE = 200.00; 
+
+        // SSS Table (Assuming provided values are the total amount client must account for in their estimate)
+        const SSS_TABLE = [
+            { min: 0.00, max: 5249.99, contribution: 510.00 },
+            { min: 5250.00, max: 5749.99, contribution: 560.00 },
+            { min: 5750.00, max: 6249.99, contribution: 610.00 },
+            { min: 6250.00, max: 6749.99, contribution: 660.00 },
+            { min: 6750.00, max: 7249.99, contribution: 710.00 },
+            { min: 7250.00, max: 7749.99, contribution: 760.00 },
+            { min: 7750.00, max: 8249.99, contribution: 810.00 },
+            { min: 8250.00, max: 8749.99, contribution: 860.00 },
+            { min: 8750.00, max: 9249.99, contribution: 910.00 },
+            { min: 9250.00, max: 9749.99, contribution: 960.00 },
+            { min: 9750.00, max: 10249.99, contribution: 1010.00 },
+            { min: 10250.00, max: 10749.99, contribution: 1060.00 },
+            { min: 10750.00, max: 11249.99, contribution: 1110.00 },
+            { min: 11250.00, max: 11749.99, contribution: 1160.00 },
+            { min: 11750.00, max: 12249.99, contribution: 1210.00 },
+            { min: 12250.00, max: 12749.99, contribution: 1260.00 },
+            { min: 12750.00, max: 13249.99, contribution: 1310.00 },
+            { min: 13250.00, max: 13749.99, contribution: 1360.00 },
+            { min: 13750.00, max: 14249.99, contribution: 1410.00 },
+            { min: 14250.00, max: 14749.99, contribution: 1460.00 },
+            { min: 14750.00, max: 15249.99, contribution: 1530.00 },
+            { min: 15250.00, max: 15749.99, contribution: 1580.00 },
+            { min: 15750.00, max: 16249.99, contribution: 1630.00 },
+            { min: 16250.00, max: 16749.99, contribution: 1680.00 },
+            { min: 16750.00, max: 17249.99, contribution: 1730.00 },
+            { min: 17250.00, max: 17749.99, contribution: 1780.00 },
+            { min: 17750.00, max: 18249.99, contribution: 1830.00 },
+            { min: 18250.00, max: 18749.99, contribution: 1880.00 },
+            { min: 18750.00, max: 19249.99, contribution: 1930.00 },
+            { min: 19250.00, max: 19749.99, contribution: 1980.00 },
+            { min: 19750.00, max: 20249.99, contribution: 2030.00 },
+            { min: 20250.00, max: 20749.99, contribution: 2080.00 },
+            { min: 20750.00, max: 21249.99, contribution: 2130.00 },
+            { min: 21250.00, max: 21749.99, contribution: 2180.00 },
+            { min: 21750.00, max: 22249.99, contribution: 2230.00 },
+            { min: 22250.00, max: 22749.99, contribution: 2280.00 },
+            { min: 22750.00, max: 23249.99, contribution: 2330.00 },
+            { min: 23250.00, max: 23749.99, contribution: 2380.00 },
+            { min: 23750.00, max: 24249.99, contribution: 2430.00 },
+            { min: 24250.00, max: 24749.99, contribution: 2480.00 },
+            { min: 24750.00, max: 25249.99, contribution: 2530.00 },
+            { min: 25250.00, max: 25749.99, contribution: 2580.00 },
+            { min: 25750.00, max: 26249.99, contribution: 2630.00 },
+            { min: 26250.00, max: 26749.99, contribution: 2680.00 },
+            { min: 26750.00, max: 27249.99, contribution: 2730.00 },
+            { min: 27250.00, max: 27749.99, contribution: 2780.00 },
+            { min: 27750.00, max: 28249.99, contribution: 2830.00 },
+            { min: 28250.00, max: 28749.99, contribution: 2880.00 },
+            { min: 28750.00, max: 29249.99, contribution: 2930.00 },
+            { min: 29250.00, max: 29749.99, contribution: 2980.00 },
+            { min: 29750.00, max: 30249.99, contribution: 3030.00 },
+            { min: 30250.00, max: 30749.99, contribution: 3080.00 },
+            { min: 30750.00, max: 31249.99, contribution: 3130.00 },
+            { min: 31250.00, max: 31749.99, contribution: 3180.00 },
+            { min: 31750.00, max: 32249.99, contribution: 3230.00 },
+            { min: 32250.00, max: 32749.99, contribution: 3280.00 },
+            { min: 32750.00, max: 33249.99, contribution: 3330.00 },
+            { min: 33250.00, max: 33749.99, contribution: 3380.00 },
+            { min: 33750.00, max: 34249.99, contribution: 3430.00 },
+            { min: 34250.00, max: 34749.99, contribution: 3480.00 },
+            { min: 34750.00, max: Infinity, contribution: 3530.00 } // Over 34,750
+        ];
+
+        // HMO Principal Cost Table (based on Base Salary input)
+        // UPDATED: Added dependent cost to each entry
+        const HMO_TABLE = [
+            { min: 20000.00, max: 40000.00, principal: 1848.35, dependent: 1628.55 },
+            { min: 40001.00, max: 65000.00, principal: 1848.35, dependent: 1628.55 },
+            { min: 65001.00, max: 95000.00, principal: 2105.60, dependent: 1628.55 },
+            { min: 95001.00, max: 130000.00, principal: 2105.60, dependent: 1848.35 },
+            { min: 130001.00, max: 180000.00, principal: 2865.10, dependent: 1848.35 },
+            { min: 180001.00, max: 250000.00, principal: 2865.10, dependent: 2105.60 },
+            { min: 250001.00, max: 400000.00, principal: 3276.70, dependent: 2105.60 },
+            { min: 400001.00, max: Infinity, principal: 3276.70, dependent: 2599.45 } // Over 400,001
+        ];
+
+
+        // --- Lookup Functions ---
+
+        /**
+         * Calculates the SSS Contribution based on the employee's gross monthly salary.
+         */
+        function calculateSSS(grossSalary) {
+            const entry = SSS_TABLE.find(item => grossSalary >= item.min && grossSalary <= item.max);
+            // Assuming the contribution value provided is the full amount the client must account for.
+            return entry ? entry.contribution : 0; 
+        }
+
+        /**
+         * Calculates the PHIC Employer's Share based on the gross monthly salary.
+         */
+        function calculatePHIC(grossSalary) {
+            // Employer share is generally 50% of the total premium.
+            // Below 10k: Total 500, Employer 250
+            if (grossSalary <= 10000.00) return 250.00;
+            
+            // 100k and over: Total 5000, Employer 2500
+            if (grossSalary >= 100000.00) return 2500.00;
+            
+            // 10,000.01 to 99,999.99: 5% total premium, 2.5% Employer share
+            return grossSalary * 0.025; 
+        }
+
+        /**
+         * Gets the total HMO cost (Principal + 1 Dependent) based on the employee's base monthly salary.
+         */
+        function calculateHMO(baseSalary) {
+            const entry = HMO_TABLE.find(item => baseSalary >= item.min && baseSalary <= item.max);
+            // Return Principal cost plus Dependent cost (assuming 1 dependent is included)
+            return entry ? (entry.principal + entry.dependent) : 0; 
+        }
+
+        // --- Utility Functions ---
+
+        /**
+         * Formats a number as a currency string.
+         * @param {number} amount - The numeric value to format.
+         * @param {string} currencyCode - The 3-letter currency code (e.g., 'PHP').
+         * @returns {string} The formatted currency string.
+         */
+        function formatCurrency(amount, currencyCode) {
+            const formatter = new Intl.NumberFormat('en-PH', {
+                style: 'currency',
+                currency: currencyCode,
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            return formatter.format(amount);
+        }
+
+        // --- Core Calculation Logic ---
+
+        function calculateInvoice() {
+            // 1. Get Input Values
+            const baseSalary = parseFloat(document.getElementById('monthlySalary').value) || 0;
+            const shiftRate = parseFloat(document.querySelector('input[name="shift"]:checked').value);
+            const currencyCode = document.getElementById('invoiceCurrency').value;
+            const needsOffice = document.getElementById('officeSpace').checked;
+            const laptopOption = document.querySelector('input[name="laptopOption"]:checked').value;
+            
+            if (baseSalary < 0) {
+                document.getElementById('monthlySalary').value = 0;
+                return;
+            }
+
+            // --- Calculation Variables (All calculated in PHP first) ---
+            let monthlyRecurringPHP = 0;
+            let oneTimeUpfrontPHP = 0;
+
+            // --- A. GROSS SALARY CALCULATION ---
+            const shiftDifferential = baseSalary * shiftRate;
+            const grossMonthlySalary = baseSalary + shiftDifferential; // Base Salary + Shift Differential
+
+            // --- B. FIXED FEE CONVERSION ---
+            const fixedFees = FIXED_FEES[currencyCode] || FIXED_FEES['PHP']; 
+            // Exchange rate is defined as PHP per 1 unit of the invoice currency (e.g., 55.00 for USD)
+            const phpPerUnitOfInvoiceCurrency = EXCHANGE_RATES[currencyCode] || 1; 
+
+            // Calculate the fixed monthly service fee and setup fee in PHP
+            const serviceFeePHP = fixedFees.service * phpPerUnitOfInvoiceCurrency;
+            const setupFeePHP = fixedFees.setup * phpPerUnitOfInvoiceCurrency;
+
+            // --- C. EMPLOYEE COST COMPONENTS (Recurring - PHP) ---
+            
+            // 1. Statutory Benefits (Total Employer Share for Quote)
+            const sssCostPHP = calculateSSS(grossMonthlySalary);
+            const phicCostPHP = calculatePHIC(grossMonthlySalary);
+            const hdmfCostPHP = HDMF_EMPLOYER_SHARE;
+            const totalStatutoryCostPHP = sssCostPHP + phicCostPHP + hdmfCostPHP;
+
+            // 2. HMO (Principal + Dependent Cost)
+            const hmoCostPHP = calculateHMO(baseSalary); 
+            
+            // 3. 13th Month & Tenure Fund (1/12th of Base Salary)
+            const baseSalaryTwelfthPHP = baseSalary / 12;
+            const thirteenthMonthCostPHP = baseSalaryTwelfthPHP;
+            const tenureFundCostPHP = baseSalaryTwelfthPHP;
+            const annualizationCostPHP = thirteenthMonthCostPHP + tenureFundCostPHP;
+
+            // 4. Municipal Tax Calculation
+            // Base for Municipal Tax calculation: Gross Salary + Statutory + HMO + Annualization
+            const municipalTaxBase = grossMonthlySalary + totalStatutoryCostPHP + hmoCostPHP + annualizationCostPHP;
+            // Municipal Tax = (Base / 0.99) * 0.01;
+            const municipalTaxPHP = (municipalTaxBase / 0.99) * 0.01;
+
+            // 5. Office Cost (MOVED TO SERVICE FEE SECTION)
+            const officeMonthlyCostPHP = needsOffice ? OFFICE_SPACE_COST : 0;
+
+            // 6. Laptop Costs (Lease to Own - Monthly) (MOVED TO SERVICE FEE SECTION)
+            let laptopMonthlyFeePHP = 0;
+            let laptopUpfrontCostPHP = 0;
+            let upfrontMessage;
+
+            if (laptopOption === 'upfront') {
+                // Upfront Purchase: One-time cost (Base + 15% Markup)
+                laptopUpfrontCostPHP = LAPTOP_BASE_COST * (1 + LAPTOP_UPFRONT_MARKUP);
+                upfrontMessage = `One-time Setup Fee, Employee Cost Deposit, and Laptop Upfront Purchase.`;
+            } else if (laptopOption === 'lease') {
+                // Lease to Own: Monthly cost over 24 months (Base + 5.5% Fee)
+                const totalLeaseAmount = LAPTOP_BASE_COST * (1 + LAPTOP_LEASE_FEE_RATE);
+                laptopMonthlyFeePHP = totalLeaseAmount / LAPTOP_LEASE_MONTHS;
+                upfrontMessage = `Includes one-time Setup Fee and Employee Cost Deposit.`;
+            } else {
+                // No Laptop Needed
+                upfrontMessage = `Includes one-time Setup Fee and Employee Cost Deposit.`;
+            }
+            
+            // --- D. EMPLOYEE COST DEPOSIT CALCULATION (One-Time - PHP) ---
+            // Employee cost deposit = Base Salary + Statutory benefits + Municipal Tax (calculated on Base Salary + Statutory Benefits)
+            
+            // Municipal Tax Base for Deposit (Base Salary + Statutory Benefits)
+            const depositTaxBase = baseSalary + totalStatutoryCostPHP;
+            const depositMunicipalTaxPHP = (depositTaxBase / 0.99) * 0.01;
+
+            const employeeCostDepositPHP = baseSalary + totalStatutoryCostPHP + depositMunicipalTaxPHP;
+
+            // --- E. FINAL COST TOTALS (PHP) ---
+
+            // Total Employee Cost (Direct compensation and statutory costs - Recurring)
+            const totalEmployeeCostPHP = grossMonthlySalary + totalStatutoryCostPHP + hmoCostPHP + annualizationCostPHP + municipalTaxPHP;
+
+            // Total Service and Resource Cost (Recurring)
+            const totalServiceResourceCostPHP = serviceFeePHP + officeMonthlyCostPHP + laptopMonthlyFeePHP;
+            
+            // Total Monthly Recurring Invoice 
+            monthlyRecurringPHP = totalEmployeeCostPHP + totalServiceResourceCostPHP;
+
+            // Total One-Time Upfront Invoice
+            oneTimeUpfrontPHP = setupFeePHP + employeeCostDepositPHP + laptopUpfrontCostPHP;
+            
+            // --- F. Currency Conversion ---
+
+            // Convert PHP totals and breakdown items to the Invoice Currency
+            const monthlyRecurringConverted = monthlyRecurringPHP / phpPerUnitOfInvoiceCurrency;
+            const oneTimeUpfrontConverted = oneTimeUpfrontPHP / phpPerUnitOfInvoiceCurrency;
+
+            // CONVERTED BREAKDOWN ITEMS
+            const conv = (phpAmount) => phpAmount / phpPerUnitOfInvoiceCurrency;
+
+            // Monthly Breakdown Items
+            const convGrossSalary = conv(grossMonthlySalary);
+            const convTotalStatutory = conv(totalStatutoryCostPHP);
+            const convSssCost = conv(sssCostPHP);
+            const convPhicCost = conv(phicCostPHP);
+            const convHdmfCost = conv(hdmfCostPHP);
+            const convHmoCost = conv(hmoCostPHP);
+            const conv13thMonthCost = conv(thirteenthMonthCostPHP);
+            const convTenureFundCost = conv(tenureFundCostPHP);
+            const convMunicipalTax = conv(municipalTaxPHP);
+            const convOfficeMonthlyCost = conv(officeMonthlyCostPHP);
+            const convLaptopMonthlyFee = conv(laptopMonthlyFeePHP);
+            const convTotalEmployeeCost = conv(totalEmployeeCostPHP);
+            const convServiceFee = conv(serviceFeePHP);
+            const convTotalServiceResourceCost = conv(totalServiceResourceCostPHP);
+
+            // Upfront Breakdown Items
+            const convSetupFee = conv(setupFeePHP);
+            const convDeposit = conv(employeeCostDepositPHP);
+            const convLaptopUpfront = conv(laptopUpfrontCostPHP);
+            
+            
+            // --- 2. Update UI Results ---
+
+            // Update Breakdown Titles
+            document.getElementById('breakdownTitle').textContent = `Detailed Monthly Breakdown (${currencyCode})`;
+            document.getElementById('upfrontBreakdownTitle').textContent = `One-Time Upfront Invoice Breakdown (${currencyCode})`;
+            document.getElementById('breakdownTotalLabel').textContent = `FINAL MONTHLY INVOICE (${currencyCode}):`;
+
+            // Recurring Monthly Invoice (Converted)
+            document.getElementById('monthlyTotalResult').textContent = formatCurrency(monthlyRecurringConverted, currencyCode);
+
+            // One-Time Upfront Invoice (Converted)
+            document.getElementById('upfrontTotalResult').textContent = formatCurrency(oneTimeUpfrontConverted, currencyCode);
+            document.getElementById('upfrontMessage').textContent = upfrontMessage;
+            
+            // Conditional Styling for Upfront Box
+            const upfrontContainer = document.getElementById('upfrontResultContainer');
+            if (oneTimeUpfrontPHP > setupFeePHP) {
+                upfrontContainer.classList.remove('bg-yellow-50', 'border-yellow-300');
+                upfrontContainer.classList.add('bg-red-50', 'border-red-500');
+            } else {
+                upfrontContainer.classList.remove('bg-red-50', 'border-red-500');
+                upfrontContainer.classList.add('bg-yellow-50', 'border-yellow-300');
+            }
+
+
+            // 2.1 Monthly Breakdown
+            document.getElementById('breakdownGrossSalary').textContent = formatCurrency(convGrossSalary, currencyCode);
+            document.getElementById('breakdownSSS').textContent = formatCurrency(convSssCost, currencyCode);
+            document.getElementById('breakdownPHIC').textContent = formatCurrency(convPhicCost, currencyCode);
+            document.getElementById('breakdownHDMF').textContent = formatCurrency(convHdmfCost, currencyCode);
+            document.getElementById('breakdownStatutory').textContent = formatCurrency(convTotalStatutory, currencyCode);
+            document.getElementById('breakdownHMO').textContent = formatCurrency(convHmoCost, currencyCode);
+            document.getElementById('breakdown13thMonth').textContent = formatCurrency(conv13thMonthCost, currencyCode);
+            document.getElementById('breakdownTenureFund').textContent = formatCurrency(convTenureFundCost, currencyCode);
+            document.getElementById('breakdownMunicipalTax').textContent = formatCurrency(convMunicipalTax, currencyCode); 
+            document.getElementById('breakdownSubtotal').textContent = formatCurrency(convTotalEmployeeCost, currencyCode);
+            
+            document.getElementById('breakdownServiceFee').textContent = formatCurrency(convServiceFee, currencyCode);
+            document.getElementById('breakdownOffice').textContent = formatCurrency(convOfficeMonthlyCost, currencyCode);
+            document.getElementById('breakdownLaptopLTO').textContent = formatCurrency(convLaptopMonthlyFee, currencyCode);
+            document.getElementById('breakdownServiceResourceTotal').textContent = formatCurrency(convTotalServiceResourceCost, currencyCode);
+            
+            document.getElementById('breakdownTotalPHP').textContent = formatCurrency(monthlyRecurringConverted, currencyCode);
+            
+            // 2.2 Upfront Breakdown
+            document.getElementById('breakdownSetupFee').textContent = formatCurrency(convSetupFee, currencyCode);
+            document.getElementById('breakdownDeposit').textContent = formatCurrency(convDeposit, currencyCode);
+            document.getElementById('breakdownLaptopUpfront').textContent = formatCurrency(convLaptopUpfront, currencyCode);
+            document.getElementById('breakdownTotalUpfront').textContent = formatCurrency(oneTimeUpfrontConverted, currencyCode);
+
+            // Hide/Show Laptop Upfront cost line item based on selection
+            document.getElementById('breakdownLaptopUpfront').closest('.flex').classList.toggle('hidden', laptopOption !== 'upfront');
+        }
+
+        // Initialize calculation on load
+        window.onload = calculateInvoice;
+
+    </script>
+</body>
+</html>
